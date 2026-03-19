@@ -5,9 +5,15 @@ from langchain_core.prompts import PromptTemplate
 from langchain_huggingface import HuggingFaceEmbeddings
 from huggingface_hub import InferenceClient
 from langchain_core.runnables import RunnableParallel, RunnablePassthrough, RunnableLambda
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class YouTubeRAG:
     def __init__(self):
+
+        self.__api_key = os.getenv('HUGGINGFACEHUB_API_TOKEN')
         self.__current_video_id = None
         self.__retriever = None
         self.youtubeTranscriptapi = YouTubeTranscriptApi()
@@ -18,7 +24,7 @@ class YouTubeRAG:
         self.client = InferenceClient(
             model="Qwen/Qwen2.5-7B-Instruct",
             provider='together',
-            token="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"
+            token=self.__api_key
         )
         self.template = PromptTemplate(
             template="""

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { width: 300px; padding: 10px; font-family: sans-serif; }
+    #chat-box { height: 200px; border: 1px solid #ccc; overflow-y: scroll; margin-bottom: 10px; padding: 5px; }
+    #user-input { width: 70%; padding: 5px; }
+    #send-btn { width: 25%; padding: 5px; cursor: pointer; }
+    .msg { margin-bottom: 8px; font-size: 14px; }
+    .user { color: blue; }
+    .bot { color: green; }
+  </style>
+</head>
+<body>
+  <h3>Video Chat</h3>
+  <div id="chat-box"></div>
+  <div>
+    <input type="text" id="user-input" placeholder="Ask about the video...">
+    <button id="send-btn">Send</button>
+  </div>
+  <script src="popup.js"></script>
+</body>
+</html>

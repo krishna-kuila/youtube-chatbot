@@ -10,7 +10,14 @@
   "host_permissions": [
     "*://*.youtube.com/*"
   ],
-  "action": {
-    "default_popup": "popup.html"
-  }
+  "action": {}, 
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content.js"]
+    }
+  ]
 }

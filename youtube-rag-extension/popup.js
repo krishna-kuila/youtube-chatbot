@@ -1,47 +1,93 @@
-document.getElementById("send-btn").addEventListener("click", async () => {
+document.addEventListener("DOMContentLoaded", () => {
     const inputField = document.getElementById("user-input");
-    const message = inputField.value;
+    const sendBtn = document.getElementById("send-btn");
     const chatBox = document.getElementById("chat-box");
+    const closeBtn = document.getElementById("close-btn");
 
-    if (!message) return;
+    // Close Button Logic
+    closeBtn.addEventListener("click", () => {
+        window.close(); // This tells Chrome to close the extension popup
+    });
 
-    // Display user message in UI
-    chatBox.innerHTML += `<div class="msg user"><b>You:</b> ${message}</div>`;
-    inputField.value = "";
-
-    try {
-        // 1. Get the current active tab to extract the YouTube Video ID
-        let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-        
-        let videoId = "";
-        if (tab.url.includes("youtube.com/watch")) {
-            const urlParams = new URLSearchParams(new URL(tab.url).search);
-            videoId = urlParams.get("v");
-        } else {
-            chatBox.innerHTML += `<div class="msg bot"><b>System:</b> Please navigate to a YouTube video.</div>`;
-            return;
+    // Support hitting "Enter" to send
+    inputField.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            sendMessage();
         }
+    });
 
-        // 2. Send the message and video ID to your Python backend
-        const response = await fetch("http://127.0.0.1:8000/chat", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                video_id: videoId,
-                message: message
-            })
-        });
+    sendBtn.addEventListener("click", sendMessage);
 
-        const data = await response.json();
+    async function sendMessage() {
+        const message = inputField.value.trim();
+        if (!message) return;
 
-        // 3. Display the RAG response
-        chatBox.innerHTML += `<div class="msg bot"><b>RAG:</b> ${data.reply}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight; // Auto-scroll to bottom
+        // 1. Display User Message
+        appendMessage("You", message, "user");
+        inputField.value = "";
 
-    } catch (error) {
-        chatBox.innerHTML += `<div class="msg bot"><b>Error:</b> Could not connect to Python backend. Is it running?</div>`;
-        console.error("Error:", error);
+        // 2. Add a temporary "typing..." indicator
+        const typingId = "typing-" + Date.now();
+        appendMessage("RAG", "Thinking...", "bot", typingId);
+
+        try {
+            // Get YouTube Video ID
+            let [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            
+            let videoId = "";
+            if (tab.url && tab.url.includes("youtube.com/watch")) {
+                const urlParams = new URLSearchParams(new URL(tab.url).search);
+                videoId = urlParams.get("v");
+            } else {
+                removeMessage(typingId);
+                appendMessage("System", "Please navigate to a YouTube video.", "bot");
+                return;
+            }
+
+            // Send to Python Backend
+            const response = await fetch("http://127.0.0.1:8000/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ video_id: videoId, message: message })
+            });
+
+            const data = await response.json();
+
+            // Remove typing indicator and show real response
+            removeMessage(typingId);
+            appendMessage("RAG", data.reply, "bot");
+
+        } catch (error) {
+            removeMessage(typingId);
+            appendMessage("System", "Error: Could not connect to Python backend.", "bot");
+            console.error("Error:", error);
+        }
+    }
+
+    // Helper function to build the chat UI elements
+    function appendMessage(sender, text, type, id = null) {
+        const wrapper = document.createElement("div");
+        wrapper.className = `msg-wrapper ${type}`;
+        if (id) wrapper.id = id;
+
+        const label = document.createElement("span");
+        label.className = "sender-label";
+        label.innerText = sender;
+
+        const bubble = document.createElement("div");
+        bubble.className = "msg";
+        bubble.innerText = text;
+
+        wrapper.appendChild(label);
+        wrapper.appendChild(bubble);
+        chatBox.appendChild(wrapper);
+
+        // Auto-scroll to the bottom
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function removeMessage(id) {
+        const element = document.getElementById(id);
+        if (element) element.remove();
     }
 });

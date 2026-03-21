@@ -13,8 +13,6 @@ RAG based ChatBot for youtube video by using a Browser Plugin. This is the chatb
 4. Step 4: Activate venv by using `.venv\Source\Activate`.
 5. Step 5: Run ` pip install -r requirements.txt ` command for install the required packages.
 6. Step 6: Get the Plugin in your browser by
-   . Open your browser
-   . Open extension tab and on the > Developer mode.
-   . Clicked the > Load Unpacked and choose the > Youtube-rag-extension file.
-   . Extension will appear in the extension section.
+   * Open your browser > Open extension tab > On Developer mode > Clicked theLoad Unpacked > choose Youtube-rag-extension file.
+   * Extension will appear in the extension section.
 8. Step 6: Run the Main module by using ` python app.py ` command. This open an FastAPI server where the request sent and get the response.

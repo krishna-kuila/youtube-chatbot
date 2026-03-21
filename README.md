@@ -17,5 +17,5 @@ RAG based ChatBot for youtube video by using a Browser Plugin. This is the chatb
    * Extension will appear in the extension section.
      
 8. Step 6: Run the Main module by using ` python app.py ` command. This open an FastAPI server where the request sent and get the response.
-9. Step 7: Open any Youtube video which have ~English caption~ available.
+9. Step 7: Open any Youtube video which have **English caption available.
 10. Step 8: Start the extension and chat about the video. After succesfully chating close the server by using `Control + C` in CLI.
